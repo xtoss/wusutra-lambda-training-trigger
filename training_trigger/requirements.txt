@@ -1,0 +1,16 @@
+# PyTorch packages - SageMaker will install from appropriate index
+torch==2.0.1
+# torchvision not in original requirements - removed to match 9/11
+# torchaudio not in original requirements - removed to match 9/11
+librosa==0.10.1
+soundfile==0.12.1
+transformers==4.30.2
+datasets==2.14.0
+accelerate==0.20.3
+numpy==1.24.0
+scipy==1.11.0
+tokenizers==0.13.3
+pyarrow==12.0.1
+# peft was not installed on 9/11 - removed
+peft==0.4.0
+huggingface_hub==0.16.4

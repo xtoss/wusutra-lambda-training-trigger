@@ -1,0 +1,56 @@
+service: wusutra-training-trigger
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    S3_BUCKET: wusutra-audio-files
+    SAGEMAKER_ROLE_ARN: arn:aws:iam::632030910469:role/WusutraSageMakerRole
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:ListBucket
+          Resource:
+            - arn:aws:s3:::wusutra-audio-files/*
+            - arn:aws:s3:::wusutra-audio-files
+        - Effect: Allow
+          Action:
+            - sagemaker:CreateTrainingJob
+            - sagemaker:DescribeTrainingJob
+            - sagemaker:ListTrainingJobs
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - iam:PassRole
+          Resource: ${self:provider.environment.SAGEMAKER_ROLE_ARN}
+
+functions:
+  trainingTrigger:
+    handler: training_trigger/lambda_function.lambda_handler
+    timeout: 30
+    memorySize: 512
+    events:
+      - http:
+          path: /v1/training/trigger
+          method: post
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                mode: false
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    layer: true
+    slim: true
+    strip: false
